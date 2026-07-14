@@ -1,0 +1,29 @@
+package com.example.appsdenotas_20241742;
+
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        ViewPager viewPager = findViewById(R.id.viewPager);
+        TabLayout tabs = findViewById(R.id.tabs);
+
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        adapter.addFragment(new FragmentAgregar(), "Agregar");
+        adapter.addFragment(new FragmentVer(), "Ver");
+        adapter.addFragment(new FragmentEditar(), "Editar");
+
+        viewPager.setAdapter(adapter);
+        tabs.setupWithViewPager(viewPager);
+    }
+}

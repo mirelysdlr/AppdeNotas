@@ -1,0 +1,90 @@
+package com.example.appsdenotas_20241742;
+
+import android.app.AlertDialog;
+import android.database.Cursor;
+import android.os.Bundle;
+import androidx.fragment.app.Fragment;
+import android.view.*;
+import android.widget.*;
+
+import java.util.ArrayList;
+
+public class FragmentEditar extends Fragment {
+
+    ListView lista;
+    DBHelper db;
+    ArrayList<String> datos = new ArrayList<>();
+    ArrayList<Integer> ids = new ArrayList<>();
+
+    public FragmentEditar() { }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.fragment_editar, container, false);
+
+        lista = v.findViewById(R.id.listaEditar);
+        db = new DBHelper(getContext());
+
+        cargarNotas();
+
+        lista.setOnItemClickListener((parent, view, position, id) -> {
+
+            int idNota = ids.get(position);
+
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Opciones")
+                    .setItems(new String[]{"Editar","Eliminar"},(dialog, which)->{
+
+                        if(which==1){
+                            db.eliminar(idNota);
+                            Toast.makeText(getContext(),"Nota eliminada",Toast.LENGTH_SHORT).show();
+                            cargarNotas();
+                        }
+
+                        if(which==0){
+
+                            EditText nuevoTitulo = new EditText(getContext());
+                            nuevoTitulo.setHint("Nuevo título");
+
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Editar Nota")
+                                    .setView(nuevoTitulo)
+                                    .setPositiveButton("Guardar",(d,w)->{
+
+                                        String t = nuevoTitulo.getText().toString();
+                                        if(!t.isEmpty()){
+                                            db.actualizarTitulo(idNota,t);
+                                            cargarNotas();
+                                        }
+
+                                    })
+                                    .setNegativeButton("Cancelar",null)
+                                    .show();
+                        }
+                    }).show();
+        });
+
+        return v;
+    }
+
+    private void cargarNotas(){
+
+        datos.clear();
+        ids.clear();
+
+        Cursor c = db.obtener();
+
+        while(c.moveToNext()){
+            ids.add(c.getInt(0));
+            datos.add(
+                    c.getString(1) + "\n" +
+                            c.getString(2)
+            );
+        }
+
+        lista.setAdapter(new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_list_item_1, datos));
+    }
+}

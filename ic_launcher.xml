@@ -1,0 +1,56 @@
+package com.example.appsdenotas_20241742;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.content.ContentValues;
+import android.database.Cursor;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+    private static final String DB_NAME = "notas.db";
+    private static final int DB_VERSION = 1;
+
+    public DBHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE notas(" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "titulo TEXT," +
+                "descripcion TEXT," +
+                "imagen TEXT)");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS notas");
+        onCreate(db);
+    }
+
+    public void insertar(String t,String d,String i){
+        SQLiteDatabase db=getWritableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put("titulo",t);
+        cv.put("descripcion",d);
+        cv.put("imagen",i);
+        db.insert("notas",null,cv);
+    }
+
+    public Cursor obtener(){
+        return getReadableDatabase().rawQuery("SELECT * FROM notas",null);
+    }
+
+    public void eliminar(int id){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete("notas","id=?",new String[]{String.valueOf(id)});
+    }
+    public void actualizarTitulo(int id,String t){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("titulo",t);
+        db.update("notas",cv,"id=?",new String[]{String.valueOf(id)});
+    }
+}
